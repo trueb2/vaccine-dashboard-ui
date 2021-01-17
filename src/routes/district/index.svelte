@@ -1,5 +1,26 @@
 <script context="module">
-	export function preload() {
+	export async function preload(page, session) {
+        const { token } = session;
+
+        if (!token) {
+            return this.redirect(302, "login");
+        }
+
+        // const response = await this.fetch(`https://www.myapi.com/doggies`, {
+        // method: "GET",
+        // headers: {
+        //     "Content-Type": "application/json",
+        //     Accept: "application/json",
+        //     Authorization: token,
+        // },
+        // });
+
+        // const parsed = await response.json();
+
+        // if (parsed.error) {
+        //     return this.error(response.status, parsed.error);
+        // }
+
 		return this.fetch(`district.json`).then(r => r.json()).then(districts => {
 			return { districts };
 		});
