@@ -6,8 +6,8 @@
     let email = "";
     let error;
   
-    const handleLogin = async () => {
-      const response = await fetch("/login", {
+    const handleSignUp = async () => {
+      const response = await fetch("/sign-up", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -27,11 +27,11 @@
     };
   </script>
 
-<a href="sign-up">Don't have an account? Create Account and Sign In</a>
+<a href="login">Already created an account? Sign In</a>
 
-<h1>Login</h1>
+<h1>Create Account</h1>
 
-<form on:submit|preventDefault="{handleLogin}" method="post">
+<form on:submit|preventDefault="{handleSignUp}" method="post">
     <label>
         Email:
         <input type="email" bind:value="{email}" />
@@ -40,6 +40,6 @@
         Password:
         <input type="password" bind:value="{password}" />
       </label>
-      <button type="submit">Login</button>
+      <button type="submit">Sign Up</button>
 </form>
   
