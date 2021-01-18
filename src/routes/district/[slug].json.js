@@ -1,28 +1,27 @@
-import districts from './_districts.js';
+import fetch from 'node-fetch';
 
-const lookup = new Map();
-districts.forEach(district => {
-	lookup.set(district.slug, JSON.stringify(district));
-});
-
-export function get(req, res, next) {
-	// the `slug` parameter is available because
-	// this file is called [slug].json.js
-	const { slug } = req.params;
-
-	if (lookup.has(slug)) {
-		res.writeHead(200, {
-			'Content-Type': 'application/json'
+export async function get(req, res) {
+	try {
+		const { slug } = req.params
+		const result = await fetch(`http://localhost:6969/districts/slug/${slug}`, {
+			method: "GET",
+			mode: 'cors',
+			headers: {
+				"Content-Type": "application/json",
+				Accept: "application/json",
+				'Access-Control-Allow-Origin': '*',
+				'Authorization': `Bearer ${req.session.token}`,
+			},
 		});
 
-		res.end(lookup.get(slug));
-	} else {
-		res.writeHead(404, {
-			'Content-Type': 'application/json'
-		});
+		const parsed = await result.json();
 
-		res.end(JSON.stringify({
-			message: `Not found`
-		}));
+		if (typeof parsed.error !== "undefined") {
+			throw new Error(parsed.error);
+		}
+
+		res.end(JSON.stringify(parsed));
+	} catch (error) {
+		res.end(JSON.stringify({ error: error.message }));
 	}
 }

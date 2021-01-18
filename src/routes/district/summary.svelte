@@ -21,14 +21,14 @@
             return this.error(response.status, parsed.error);
         }
 
-		return this.fetch(`district.json`).then(r => r.json()).then(districts => {
-			return { districts };
+		return this.fetch(`district/summary.json`).then(r => r.json()).then(district => {
+			return { district };
 		});
 	}
 </script>
 
 <script>
-	export let districts;
+	export let district;
 </script>
 
 <style>
@@ -39,18 +39,13 @@
 </style>
 
 <svelte:head>
-	<title>All Districts</title>
+	<title>Summary</title>
 </svelte:head>
 
-<a href="district/summary">Summary</a>
-<h1>Recent districts</h1>
+<h1>Summary</h1>
 
 <ul>
-	{#each districts as district}
-		<!-- we're using the non-standard `rel=prefetch` attribute to
-				tell Sapper to load the data for the page as soon as
-				the user hovers over the link or taps it, instead of
-				waiting for the 'click' event -->
-		<li><a rel="prefetch" href="district/{district.slug}">{district.display_name}</a></li>
-	{/each}
+    <li>Unvaccinated: {district.unvaccinated}</li>
+    <li>Vaccinated: {district.vaccinated}</li>
+    <li>Interested: {district.interested}</li>
 </ul>

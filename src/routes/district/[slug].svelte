@@ -1,12 +1,12 @@
 <script context="module">
-	export async function preload({ params }) {
+	export async function preload({ params }, session) {
 		// the `slug` parameter is available because
 		// this file is called [slug].svelte
 		const res = await this.fetch(`district/${params.slug}.json`);
 		const data = await res.json();
 
 		if (res.status === 200) {
-			return { district: data };
+			return { district: data, session };
 		} else {
 			this.error(res.status, data.message);
 		}
@@ -15,6 +15,73 @@
 
 <script>
 	export let district;
+	export let session;
+
+	let vaccinated = 0 
+	let unvaccinated = 0 
+
+	const handleInterest = async () => {
+		const result = await fetch(`http://localhost:6969/districts/increment?id=${district.id}&interested=true`, {
+			method: "POST",
+			mode: 'cors',
+			headers: {
+				"Content-Type": "application/json",
+				Accept: "application/json",
+				'Access-Control-Allow-Origin': '*',
+				'Authorization': `Bearer ${session.token}`,
+			},
+		});
+	
+		const parsed = await result.json();
+	
+		if (typeof parsed.error !== "undefined") {
+			throw new Error(parsed.error);
+		}
+	}
+
+	const handleVaccinated = async () => {
+		console.log('vaccinated');
+		const result = await fetch(`http://localhost:6969/districts/increment?id=${district.id}&vaccinated=true`, {
+			method: "POST",
+			mode: 'cors',
+			headers: {
+				"Content-Type": "application/json",
+				Accept: "application/json",
+				'Access-Control-Allow-Origin': '*',
+				'Authorization': `Bearer ${session.token}`,
+			},
+		});
+	
+		const parsed = await result.json();
+	
+		if (typeof parsed.error !== "undefined") {
+			throw new Error(parsed.error);
+		}
+
+		vaccinated += 1;
+	}
+
+	const handleUnvaccinated = async () => {
+		console.log('unvaccinated');
+		const result = await fetch(`http://localhost:6969/districts/increment?id=${district.id}&unvaccinated=true`, {
+			method: "POST",
+			mode: 'cors',
+			headers: {
+				"Content-Type": "application/json",
+				Accept: "application/json",
+				'Access-Control-Allow-Origin': '*',
+				'Authorization': `Bearer ${session.token}`,
+			},
+		});
+	
+		const parsed = await result.json();
+	
+		if (typeof parsed.error !== "undefined") {
+			throw new Error(parsed.error);
+		}
+
+		unvaccinated += 1;
+	}
 </script>
 
 <style>
@@ -54,17 +121,31 @@
 </style>
 
 <svelte:head>
-	<title>{district.name}</title>
+	<title>{district.display_name}</title>
 </svelte:head>
 
-<h1>{district.name}</h1>
+<h1>{district.display_name}</h1>
 
 <div class="content">
-	<p> Of the visitors that claimed to be from {district.name}</p>
+	<p> Of the visitors that claimed to be from {district.display_name}</p>
 	<p>
-		<strong>{district.vaccinated_visitors}</strong> claimed to be <strong>vaccinated</strong> and
+		<strong>{district.vaccinated + vaccinated}</strong> claimed to be <strong>vaccinated</strong> and
 	</p>
 	<p>
-		<strong>{district.unvaccinated_visitors}</strong> claimed to be <strong>un</strong>-vaccinated.
+		<strong>{district.unvaccinated + unvaccinated}</strong> claimed to be <strong>un</strong>-vaccinated.
 	</p>
+
 </div>
+
+<hr/>
+
+<form on:submit|preventDefault="{handleInterest}" method="post">
+	<button type="submit">Add Interest</button>
+</form>
+<form on:submit|preventDefault="{handleVaccinated}" method="post">
+	<button type="submit">Add Vaccinated</button>
+</form>
+<form on:submit|preventDefault="{handleUnvaccinated}" method="post">
+	<button type="submit">Add <strong>Un</strong>vaccinated</button>
+</form>
+

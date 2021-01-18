@@ -2,7 +2,7 @@ import fetch from "node-fetch";
 
 export async function get(req, res) {
   try {
-    const result = await fetch(`http://localhost:6969/districts?sorted=true`, {
+    const result = await fetch(`http://localhost:6969/districts/summary`, {
         method: "GET",
         mode: 'cors',
         headers: {
